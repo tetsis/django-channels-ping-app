@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Public Ping</title>
+</head>
+<body>
+    <p>
+        Name: <input type="text" id="name">
+        <button id="change-name">Change Name</button>
+    </p>
+
+    <p>
+    Ping: <span id="delay-time">-</span> ms
+    </p>
+    <table id="ping-table" border="1"></table>
+    <script>
+        const interval = 2000;
+        var pingTime;
+        var timer;
+        var sending = true;
+        var pingList = {};
+
+        const socket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/public/'
+        );
+
+        socket.onopen = function() {
+            sendPing();
+            timer = setInterval(sendPing, interval);
+        }
+
+        socket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            if (data.command == 'pong') {
+                var pongTime = Date.now();
+                var delayTime = pongTime - pingTime;
+                document.getElementById('delay-time').textContent = delayTime;
+                sending = true;
+
+                // Send delay time to server
+                sendDelayTime(delayTime);
+            }
+            else if (data.command == 'connect') {
+                var channelName = data.channel_name;
+                var name = data.name;
+                pingList[channelName] = {
+                    'name': name,
+                    'delay_time': '-'
+                };
+                displayPings();
+            }
+            else if (data.command == 'delay_times') {
+                var delayTimes = data.delay_times
+                console.log(delayTimes);
+                pingList = delayTimes;
+                displayPings();
+            }
+            else if (data.command == 'change_name') {
+                var channelName = data.channel_name;
+                var name = data.name;
+                pingList[channelName]['name'] = name;
+                displayPings();
+            }
+            else if (data.command == 'disconnect') {
+                console.log('disconnection');
+                var channelName = data.channel_name;
+                delete pingList[channelName];
+                displayPings();
+            }
+        };
+
+        socket.onclose = function(e) {
+            console.error('Socket closed unexpectedly');
+            document.getElementById('delay-time').textContent = '-';
+            document.getElementById('ping-table').innerHTML = '';
+            clearInterval(timer);
+        };
+
+        var sendPing = function() {
+            if (sending) {
+                pingTime = Date.now();
+                socket.send(JSON.stringify({
+                    'command': 'ping'
+                }));
+                sending = false;
+            }
+            else {
+                document.getElementById('delay-time').textContent = '> ' + interval;
+            }
+        }
+
+        var sendDelayTime = function(delayTime) {
+            socket.send(JSON.stringify({
+                'command': 'delay_time',
+                'delay_time': delayTime
+            }));
+        }
+
+        var displayPings = function() {
+            var table = document.getElementById('ping-table');
+            table.innerHTML = "";
+
+            for (let key in pingList) {
+                var row = table.insertRow(-1);
+                var cellChannelName = row.insertCell(0);
+                var cellDelayTime = row.insertCell(1);
+                cellChannelName.textContent = pingList[key]['name'];
+                cellDelayTime.textContent = pingList[key]['delay_time']  + ' ms';
+            }
+        }
+
+        document.getElementById('change-name').onclick = function() {
+            var name = document.getElementById('name').value;
+            socket.send(JSON.stringify({
+                'command': 'change_name',
+                'name': name
+            }));
+        }
+    </script>
+</body>
+</html>

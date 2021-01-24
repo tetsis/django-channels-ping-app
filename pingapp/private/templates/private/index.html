@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Private Ping</title>
+</head>
+<body>
+    Ping: <span id="delay-time">-</span> ms
+    <script>
+        const interval = 2000;
+        var pingTime;
+        var timer;
+        var sending = true;
+
+        const socket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/private/'
+        );
+
+        socket.onopen = function() {
+            sendPing();
+            timer = setInterval(sendPing, interval);
+        }
+
+        socket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            if (data.command == 'pong') {
+                var pongTime = Date.now();
+                var delayTime = pongTime - pingTime;
+                document.getElementById('delay-time').textContent = delayTime;
+                sending = true;
+            }
+        };
+
+        socket.onclose = function(e) {
+            console.error('Socket closed unexpectedly');
+            document.getElementById('delay-time').textContent = '-';
+            clearInterval(timer);
+        };
+
+        var sendPing = function() {
+            if (sending) {
+                pingTime = Date.now();
+                socket.send(JSON.stringify({
+                    'command': 'ping'
+                }));
+                sending = false;
+            }
+            else {
+                document.getElementById('delay-time').textContent = '> ' + interval;
+            }
+        }
+    </script>
+</body>
+</html>
