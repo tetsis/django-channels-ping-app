@@ -31,6 +31,7 @@ Delay time = Tr - Ts
 # Run
 ```
 pip install -r requirements.txt
+docker run -p 6379:6379 -d redis:5
 cd pingapp
 python manage.py migrate
 python manage.py runserver
