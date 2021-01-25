@@ -28,7 +28,7 @@ Clent                    Server
 Delay time = Tr - Ts
 ```
 
-# Test Run
+# Test run
 ```
 pip install -r requirements.txt
 docker run -p 6379:6379 -d redis:5
@@ -36,6 +36,14 @@ cd pingapp
 python manage.py migrate
 python manage.py runserver
 ```
+Access to [http://127.0.0.1:8000](http://127.0.0.1:8000)
+
+# Run by docker compose
+```
+docker-compose build
+docker-compose up -d
+```
+Access to [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
 # References
 - [Tutorial of Django Channels](https://channels.readthedocs.io/en/stable/tutorial/index.html)

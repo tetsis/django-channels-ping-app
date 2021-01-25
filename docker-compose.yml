@@ -5,7 +5,7 @@ services:
     build: .
     command: daphne -b 0.0.0.0 -p 8000 pingapp.asgi:application
     environment:
-      - DJANGO_SETTINGS_MODULE=pingapp.settings
+      - CHANNEL=channel
     ports:
       - "8000:8000"
     depends_on:
