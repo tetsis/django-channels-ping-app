@@ -11,21 +11,53 @@ If multiple clients access this page, they can see only themselves delay time.
 ## Public
 This page displays delay times of all clients who access this page.
 
-# Measurement method of delay time
+# WebSocket protocols
+## Measurement method of delay time
 This app uses WebSocket for measurement of delay time.
 
 ```
-Clent                    Server
+Client                   Server
   |                        |
   |-- Connect WebSocket -->|
   |                        |
  (Ts)                      |
-  |--------- Ping -------->|  
-  |<-------- Pong ---------|  
+  |--------- Ping -------->|
+  |<-------- Pong ---------|
  (Tr)                      |
   |                        |
 
 Delay time = Tr - Ts
+```
+
+## Connection (public page)
+```
+Client A                 Server                  Client B
+  |                        |                        |
+  |-- Connect WebSocket -->|                        |
+  |<- [Broadcast] Connect -|                        |
+  |                        |                        |
+  |                        |<-- Connect WebSocket --|
+  |<- [Broadcast] Connect -|- [Broadcast] Connect ->|
+  |                        |                        |
+```
+
+## Send delay time to server and receive delay times of all clients (public page)
+```
+Client                   Server
+  |                        |
+  |----- Delay time ------>|
+  |                Record delay time
+  |<--- Delay time list ---|
+  |                        |
+```
+
+## Disconnection (public page)
+```
+Client A                  Server                  Client B
+  |                         |                         |
+  |                Detect disconnection               |
+  |<-[Broadcast] Disconnect-|-[Broadcast] Disconnect->|
+  |                         |                         |
 ```
 
 # Test run
