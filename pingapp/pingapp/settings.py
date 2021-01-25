@@ -25,7 +25,7 @@ SECRET_KEY = 'xtfs9vmq!^op4pn^nh1!=r#%$bh4u25@z+9=q&4z(^@#&z15@w'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition

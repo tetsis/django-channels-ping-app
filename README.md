@@ -28,7 +28,7 @@ Clent                    Server
 Delay time = Tr - Ts
 ```
 
-# Run
+# Test Run
 ```
 pip install -r requirements.txt
 docker run -p 6379:6379 -d redis:5
@@ -36,3 +36,9 @@ cd pingapp
 python manage.py migrate
 python manage.py runserver
 ```
+
+# References
+- [Tutorial of Django Channels](https://channels.readthedocs.io/en/stable/tutorial/index.html)
+- [Deploying of Django Channels](https://channels.readthedocs.io/en/stable/deploying.html)
+- [Quickstart: Compose and Django](https://docs.docker.com/compose/django/)
+    - [クィックスタート: Compose と Django](https://docs.docker.jp/compose/django.html)
